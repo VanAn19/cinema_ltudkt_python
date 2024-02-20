@@ -4,6 +4,21 @@ from connect import cursor, conn
 import pyodbc
 
 class ManageTicket:
+    
+    REGULAR_TICKET_PRICE = 50000
+    VIP_TICKET_PRICE_PERCENTAGE = 0.2
+    PEAK_HOUR_PRICE_PERCENTAGE = 0.2
+    PEAK_HOUR_START = 18
+    PEAK_HOUR_END = 22
+    
+    def calculateTicketPrice(self, ticket):
+        basePrice = self.REGULAR_TICKET_PRICE
+        showTime = datetime.strptime(ticket.showTime, '%Y-%m-%d %H:%M') 
+        if ticket.ticketType == 'Vip':
+            basePrice += basePrice * self.VIP_TICKET_PRICE_PERCENTAGE
+        if self.PEAK_HOUR_START <= showTime.hour < self.PEAK_HOUR_END:
+            basePrice += basePrice * self.PEAK_HOUR_PRICE_PERCENTAGE
+        return basePrice
     def sellTicket(self, ticket):
         try:
             cursor.execute("SELECT COUNT(*) FROM Tickets WHERE room = ? AND showTime = ? AND seatPosition = ?", (ticket.room, ticket.showTime, ticket.seatPosition))
@@ -26,6 +41,7 @@ class ManageTicket:
             elif not ticket.ticketId.isdigit() or len(ticket.ticketId) != 4:
                 print("Mã vé phải là số và có độ dài là 4 kí tự.")
             else:
+                ticket.price = self.calculateTicketPrice(ticket)
                 cursor.execute("INSERT INTO Tickets (ticketId, room, movieName, showTime, seatPosition, ticketType, price) VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (ticket.ticketId, ticket.room, ticket.movieName, ticket.showTime, ticket.seatPosition, ticket.ticketType, ticket.price))
                 conn.commit()
@@ -124,15 +140,15 @@ class ManageTicket:
             print(e)
     def displayRevenueByMovie(self):
         try:
-            revenue_by_movie = {}
+            revenueByMovie = {}
             cursor.execute("SELECT movieName, price FROM Tickets")
             rows = cursor.fetchall()
             for row in rows:
-                if row.movieName in revenue_by_movie:
-                    revenue_by_movie[row.movieName] += row.price
+                if row.movieName in revenueByMovie:
+                    revenueByMovie[row.movieName] += row.price
                 else:
-                    revenue_by_movie[row.movieName] = row.price
-            for movie, revenue in revenue_by_movie.items():
+                    revenueByMovie[row.movieName] = row.price
+            for movie, revenue in revenueByMovie.items():
                 print(f'Revenue for {movie}: {revenue} VND')
         except pyodbc.Error as e:
             print(e)

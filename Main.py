@@ -26,8 +26,8 @@ def main():
             showTime = input("Nhập thời gian chiếu (YYYY-MM-DD HH:MM): ")
             seatPosition = input("Nhập vị trí ghế: ")
             ticketType = input("Nhập loại vé (Regular/Vip): ")
-            price = int(input("Nhập giá vé: "))
-            newTicket = Ticket(ticketId, room, movieName, showTime, seatPosition, ticketType, price)
+            # price = int(input("Nhập giá vé: "))
+            newTicket = Ticket(ticketId, room, movieName, showTime, seatPosition, ticketType, 0)
             ticketManager.sellTicket(newTicket)
             # print(f'Đã bán vé {newTicket.ticketId}')
             

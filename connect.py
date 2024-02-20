@@ -13,8 +13,3 @@ conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
                       'Trusted_Connection=yes;')
 
 cursor = conn.cursor()
-
-# cursor.execute('select * from Product')
-
-# for i in cursor:
-#     print(i)
